@@ -1,0 +1,11 @@
+creation_rules:
+  - path_regex: secrets\.staging\.yaml$
+    kms: 'arn:aws:kms:eu-west-1:487483287434:key/ec84f810-ec41-45a0-ad9e-3575324d26c4'
+
+  - path_regex: secrets\.sandbox\.yaml$
+    kms: 'arn:aws:kms:eu-west-1:487483287434:key/ec84f810-ec41-45a0-ad9e-3575324d26c4'
+
+  - path_regex: secrets\.production\.yaml$
+    kms: 'arn:aws:kms:eu-west-1:487483287434:key/ec84f810-ec41-45a0-ad9e-3575324d26c4'
+
+  - kms: 'arn:aws:kms:eu-west-1:487483287434:key/ec84f810-ec41-45a0-ad9e-3575324d26c4'

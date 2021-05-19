@@ -1,0 +1,14 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      ruby: 2.7
+    commands:
+      - pwd
+      - echo "Deploying to PRODUCTION"
+      - cat docker-image-to-deploy.txt
+
+  build:
+    commands:
+      - echo "Tests stage!"

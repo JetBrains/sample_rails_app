@@ -1,0 +1,31 @@
+version: 0.2
+
+phases:
+  install:
+    runtime-versions:
+      ruby: 2.7
+    commands:
+#      - aws sts get-caller-identity
+#      - aws kms describe-key --key-id arn:aws:kms:eu-west-1:487483287434:key/ec84f810-ec41-45a0-ad9e-3575324d26c4
+      - curl -Lo /tmp/sops.deb https://github.com/mozilla/sops/releases/download/v3.7.1/sops_3.7.1_amd64.deb
+      - dpkg -i /tmp/sops.deb
+      - sops --decrypt deployment/secrets.staging.yaml
+      - aws eks update-kubeconfig --name grze --role-arn arn:aws:iam::487483287434:role/application-ci-cd-codepipeline-eks-access-role
+      - kubectl get ns -o wide
+
+  build:
+    commands:
+      - aws ecr get-login-password --region $AWS_DEFAULT_REGION | docker login --username AWS --password-stdin $AWS_ACCOUNT_ID.dkr.ecr.$AWS_DEFAULT_REGION.amazonaws.com
+
+      - docker build -t $ECR_REPOSITORY_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION .
+      - docker tag $ECR_REPOSITORY_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION $ECR_REPOSITORY_URL:latest
+
+      - docker push $ECR_REPOSITORY_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION
+      - docker push $ECR_REPOSITORY_URL:latest
+
+      - echo "$ECR_REPOSITORY_URL:$CODEBUILD_RESOLVED_SOURCE_VERSION" > docker-image-to-deploy.txt
+
+artifacts:
+  files:
+    - docker-image-to-deploy.txt
+    - buildspecs/**/*
